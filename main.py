@@ -11,7 +11,7 @@ from app.handlers.reports import router as reports_router
 async def main():
     logging.basicConfig(level=logging.INFO)
 
-    bot = Bot(token="8372379962:AAFT2phShOoDTL3UDZVYo46LyCg6bHKbVfw")
+    bot = Bot(token="chinazes")
     dp = Dispatcher(storage=MemoryStorage())
 
     dp.include_router(start_router)
