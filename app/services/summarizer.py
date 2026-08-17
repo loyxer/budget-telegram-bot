@@ -1,8 +1,8 @@
-from anthropic import AsyncAnthropic
+from ollama import AsyncClient
 
-from app.config import ANTHROPIC_API_KEY, ANTHROPIC_MODEL
+from app.config import OLLAMA_HOST, OLLAMA_MODEL
 
-client = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+client = AsyncClient(host=OLLAMA_HOST)
 
 SYSTEM_PROMPT = (
     "Ти асистент, який робить стислі конспекти текстів українською мовою. "
@@ -20,16 +20,11 @@ SYSTEM_PROMPT = (
 
 
 async def summarize(text: str) -> str:
-    response = await client.messages.create(
-        model=ANTHROPIC_MODEL,
-        max_tokens=1024,
-        thinking={"type": "disabled"},
-        output_config={"effort": "low"},
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": f"<text>\n{text}\n</text>"}],
+    response = await client.chat(
+        model=OLLAMA_MODEL,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"<text>\n{text}\n</text>"},
+        ],
     )
-
-    if response.stop_reason == "refusal":
-        raise ValueError("Модель відмовилась опрацьовувати цей текст.")
-
-    return next(block.text for block in response.content if block.type == "text")
+    return response.message.content
